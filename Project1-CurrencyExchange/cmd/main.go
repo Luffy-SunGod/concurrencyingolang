@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Luffy-SunGod/ConcurrencyInGolang/Project1"
+	"github.com/Luffy-SunGod/ConcurrencyInGolang/Project1-CurrencyExchange"
 	"runtime"
 	"sync"
 	"time"
@@ -16,8 +16,8 @@ type ChannelCurrencyStruct struct {
 func main() {
 	numWorkers := runtime.NumCPU()
 	//fmt.Println(numWorkers)
-	ce := Project1.MyCurrencyExchange{
-		Currencies: map[string]Project1.Currency{},
+	ce := Project1_CurrencyExchange.MyCurrencyExchange{
+		Currencies: map[string]Project1_CurrencyExchange.Currency{},
 	}
 	err := ce.FetchAllCurrencies()
 	if err != nil {
@@ -27,7 +27,7 @@ func main() {
 	startTime := time.Now()
 
 	job := make(chan ChannelCurrencyStruct, 10)
-	result := make(chan Project1.Currency, 10)
+	result := make(chan Project1_CurrencyExchange.Currency, 10)
 
 	wg := &sync.WaitGroup{}
 	for i := 0; i <= numWorkers; i++ {
@@ -48,10 +48,10 @@ func main() {
 		close(result)
 	}()
 
-	finalResult := map[string]Project1.Currency{}
+	finalResult := map[string]Project1_CurrencyExchange.Currency{}
 	fmt.Println("------Result------")
 	for val := range result {
-		c := Project1.Currency{
+		c := Project1_CurrencyExchange.Currency{
 			Code:  val.Code,
 			Name:  val.Name,
 			Rates: val.Rates,
@@ -64,12 +64,12 @@ func main() {
 	fmt.Println("Time Taken: ", endTime.Sub(startTime))
 }
 
-func Worker(job chan ChannelCurrencyStruct, res chan Project1.Currency, group *sync.WaitGroup) {
+func Worker(job chan ChannelCurrencyStruct, res chan Project1_CurrencyExchange.Currency, group *sync.WaitGroup) {
 	defer group.Done()
 
 	for jobStruct := range job {
-		response, _ := Project1.FetchCurrencyRates(jobStruct.Code)
-		c := Project1.Currency{
+		response, _ := Project1_CurrencyExchange.FetchCurrencyRates(jobStruct.Code)
+		c := Project1_CurrencyExchange.Currency{
 			Code:  jobStruct.Code,
 			Name:  jobStruct.Name,
 			Rates: response,
